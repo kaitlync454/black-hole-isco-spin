@@ -2,15 +2,15 @@
 
 ## Overview
 
-This project calculates the innermost stable circular orbit (ISCO) radius for a test particle orbiting a rotating Kerr black hole. It examines how the black hole's dimensionless spin determines the ISCO radius and how black hole mass affects the corresponding physical length scale.
+This project calculates the innermost stable circular orbit (ISCO) radius for a test particle orbiting a rotating Kerr black hole. It investigates how the black hole's dimensionless spin determines the ISCO radius and how black hole mass determines the corresponding physical length scale.
 
-The project uses an analytical Kerr ISCO expression implemented in Python, automated validation tests, and numerical comparisons of black hole spin and mass. NumPy is used for numerical calculations and Matplotlib for visualization.
+The project implements an analytical Kerr ISCO expression in Python, includes automated validation tests, and produces numerical comparisons and scientific visualizations of black hole spin, mass, and orbital orientation.
 
 ## Scientific Background
 
 The innermost stable circular orbit is the smallest radius at which a test particle can maintain a stable circular orbit under the assumptions of the model.
 
-For a rotating Kerr black hole, the ISCO depends on the dimensionless spin parameter:
+For a rotating Kerr black hole, the dimensionless spin parameter is
 
 \[
 a_* = \frac{cJ}{GM^2}
@@ -29,18 +29,18 @@ In the sign convention used here, positive spin corresponds to prograde equatori
 The gravitational radius is
 
 \[
-r_g = \frac{GM}{c^2}.
+r_g = \frac{GM}{c^2}
 \]
 
 The physical ISCO radius is
 
 \[
-r_{\mathrm{ISCO}} = \rho_{\mathrm{ISCO}}r_g,
+r_{\mathrm{ISCO}} = \rho_{\mathrm{ISCO}}r_g
 \]
 
 where \(\rho_{\mathrm{ISCO}}\) is the dimensionless ISCO radius.
 
-For equatorial circular test-particle orbits, the dimensionless radius is calculated using the analytical Kerr ISCO expression:
+For equatorial circular test-particle orbits, the dimensionless ISCO radius is calculated using the analytical Kerr ISCO expression:
 
 \[
 Z_1 = 1 + (1-a_*^2)^{1/3}
@@ -54,7 +54,7 @@ Z_2 = \sqrt{3a_*^2+Z_1^2}
 \[
 \rho_{\mathrm{ISCO}} =
 3+Z_2-\operatorname{sgn}(a_*)
-\sqrt{(3-Z_1)(3+Z_1+2Z_2)}.
+\sqrt{(3-Z_1)(3+Z_1+2Z_2)}
 \]
 
 At zero spin, the prograde and retrograde cases coincide at the Schwarzschild value of \(6r_g\). The implementation handles this limit.
@@ -63,12 +63,12 @@ At zero spin, the prograde and retrograde cases coincide at the Schwarzschild va
 
 - Calculates dimensionless ISCO radii for Kerr black holes.
 - Calculates the gravitational radius from black hole mass in solar-mass units.
-- Converts dimensionless radii into physical length scales.
+- Converts dimensionless ISCO radii into physical length scales.
 - Validates spin and mass inputs.
-- Visualizes the ISCO radius as a function of dimensionless spin.
-- Compares physical radii for black holes of different masses.
-- Compares prograde, nonrotating, and retrograde cases.
-- Tests analytical benchmark values, physical trends, and mass scaling.
+- Visualizes ISCO radius as a function of dimensionless spin.
+- Compares physical ISCO radii for black holes of different masses at fixed spin.
+- Compares prograde, nonrotating, and retrograde orbital configurations.
+- Tests analytical benchmark values, expected physical trends, and mass scaling.
 
 ## Repository Structure
 
@@ -82,7 +82,9 @@ Black-hole-ISCO-spin/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
-└── isco_vs_spin.png
+├── isco_vs_spin.png
+├── isco_vs_mass.png
+└── orbit_comparison.png
 ```
 
 ## Requirements
@@ -129,11 +131,37 @@ Compare prograde and retrograde orbits:
 python orbit_comparison.py
 ```
 
+Each plotting script saves a PNG figure in the project directory.
+
 ## Results
 
-Representative dimensionless ISCO radii calculated by the model are shown below.
+### ISCO Radius vs. Spin
 
-| Dimensionless spin \(a_*\) | ISCO radius (\(r_g\)) | Orbit |
+![Kerr ISCO radius versus dimensionless spin](isco_vs_spin.png)
+
+The ISCO radius decreases as spin increases from the retrograde to the prograde regime. For a nonrotating Schwarzschild black hole, the ISCO is located at \(6r_g\).
+
+### Physical ISCO Radius vs. Black Hole Mass
+
+![Physical ISCO radius versus black hole mass](isco_vs_mass.png)
+
+At fixed dimensionless spin, the dimensionless ISCO radius remains constant, while the physical radius scales linearly with black hole mass:
+
+\[
+r_{\mathrm{ISCO}} = \rho_{\mathrm{ISCO}}\frac{GM}{c^2}
+\]
+
+The plotted comparison uses a fixed dimensionless spin of \(a_*=0.9\) and illustrates the relationship across stellar-mass, intermediate-mass, and supermassive black hole scales.
+
+### Prograde and Retrograde Orbits
+
+![Prograde and retrograde ISCO comparison](orbit_comparison.png)
+
+For a given spin magnitude, the retrograde ISCO lies farther from the black hole than the prograde ISCO. This difference reflects the influence of black hole rotation on equatorial orbital motion in the Kerr spacetime.
+
+### Representative Numerical Results
+
+| Dimensionless spin \(a_*\) | ISCO radius (\(r_g\)) | Configuration |
 |---:|---:|---|
 | -1.000 | 9.0000 | Extremal retrograde limit |
 | -0.900 | 8.7174 | Retrograde |
@@ -143,12 +171,6 @@ Representative dimensionless ISCO radii calculated by the model are shown below.
 | +0.900 | 2.3209 | Prograde |
 | +0.998 | 1.2370 | Near-extremal prograde |
 | +1.000 | 1.0000 | Extremal prograde limit |
-
-The results show that the ISCO moves inward as prograde spin increases and outward as the magnitude of retrograde spin increases.
-
-At a fixed dimensionless spin, the dimensionless ISCO radius does not depend on black hole mass. The physical radius scales linearly with mass because \(r_g = GM/c^2\).
-
-The plot `isco_vs_spin.png` visualizes the relationship between dimensionless spin and ISCO radius, including the Schwarzschild reference value.
 
 ## Validation
 
@@ -163,15 +185,15 @@ The automated tests check:
 - Linear scaling of gravitational radius with mass.
 - Positivity of the gravitational radius for valid masses.
 
-The tests passed for the implemented calculations. These checks help verify the implementation against known limits and expected physical behavior; they do not independently prove the underlying analytical model.
+The implemented test suite passed for the calculations tested. These checks verify the implementation against known limits and expected physical behavior; they do not independently prove the underlying analytical model.
 
 ## Assumptions and Limitations
 
 - The model assumes an idealized Kerr black hole described by general relativity.
 - The ISCO expression applies to equatorial circular test-particle orbits.
-- The calculation does not simulate an accretion disk or model its hydrodynamics, magnetic fields, radiation, or plasma processes.
+- The calculation does not simulate accretion-disk hydrodynamics or model magnetic fields, radiation, or plasma processes.
 - Exact extremal spin values are included as mathematical limits. Their inclusion does not imply that astrophysical black holes attain those limits.
-- The project evaluates an established analytical expression numerically; it does not independently derive the Kerr metric or solve the full geodesic equations.
+- The project numerically evaluates an established analytical expression; it does not independently derive the Kerr metric or solve the full geodesic equations.
 - Numerical results depend on the accuracy of the implementation and the precision of the calculations.
 
 ## Future Work
@@ -180,7 +202,7 @@ Potential extensions include:
 
 - Comparing results with additional independently implemented reference calculations.
 - Testing additional edge cases and numerical precision.
-- Examining how spin and mass affect physical ISCO length scales.
+- Investigating how spin and mass jointly affect physical ISCO length scales.
 - Exploring the relationship between ISCO location and accretion-disk properties.
 - Extending the analysis with more detailed physical models.
 
@@ -192,4 +214,4 @@ Potential extensions include:
 
 ---
 
-*This is an educational computational astrophysics project exploring the dependence of Kerr black hole ISCO radii on spin and mass.*
+*An educational computational astrophysics project exploring the dependence of Kerr black hole ISCO radii on spin and mass.*
