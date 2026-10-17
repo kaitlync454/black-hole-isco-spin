@@ -1,9 +1,11 @@
 
 """
-Plot the ISCO radius as a function of Kerr black hole spin.
+Plot the Kerr black hole ISCO radius as a function of spin.
 
 Run with:
-    python plot_isco.py
+    python plot_ISCO.py
+
+The radius is expressed in units of GM/c^2.
 """
 
 import numpy as np
@@ -15,53 +17,87 @@ from ISCO import calculate_isco
 def main():
     """Calculate and plot ISCO radii across a range of spins."""
 
-    # Dimensionless spin values, avoiding exact extremal endpoints.
+    # Avoid exact extremal endpoints for a clean continuous plot.
     spins = np.linspace(-0.998, 0.998, 500)
 
-    # Calculate ISCO radius for each spin.
     isco_radii = np.array([
         calculate_isco(float(spin))
         for spin in spins
     ])
 
-    # Create the figure.
-    plt.figure(figsize=(9, 6))
+    # Create figure.
+    fig, ax = plt.subplots(figsize=(9, 6))
 
-    plt.plot(
+    ax.plot(
         spins,
         isco_radii,
-        label="Kerr ISCO",
-        linewidth=2
+        linewidth=2.2,
+        label="Kerr ISCO"
     )
 
-    # Reference lines.
-    plt.axvline(
+    # Nonrotating black hole reference.
+    ax.axvline(
         0,
         linestyle="--",
-        label="Nonrotating black hole"
+        linewidth=1.2,
+        label="Zero spin"
     )
 
-    plt.axhline(
+    ax.axhline(
         6,
         linestyle=":",
-        label="Schwarzschild ISCO (6 GM/c²)"
+        linewidth=1.5,
+        label="Schwarzschild ISCO = 6 GM/c²"
     )
 
-    # Labels and formatting.
-    plt.xlabel("Dimensionless black hole spin (χ)")
-    plt.ylabel("ISCO radius (GM/c²)")
-    plt.title("Innermost Stable Circular Orbit vs. Black Hole Spin")
+    # Mark selected benchmark spin values.
+    benchmark_spins = [-0.9, 0.0, 0.5, 0.9, 0.998]
+    benchmark_radii = [
+        calculate_isco(spin) for spin in benchmark_spins
+    ]
 
-    plt.grid(True, alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
+    ax.scatter(
+        benchmark_spins,
+        benchmark_radii,
+        s=35,
+        zorder=3,
+        label="Benchmark spins"
+    )
 
-    # Save the figure.
-    plt.savefig("isco_vs_spin.png", dpi=300)
+    # Explain the two sides of the spin axis.
+    ax.text(
+        -0.95, 2.0,
+        "Retrograde orbits",
+        ha="left",
+        va="center",
+        fontsize=9
+    )
+
+    ax.text(
+        0.35, 8.4,
+        "Prograde orbits",
+        ha="left",
+        va="center",
+        fontsize=9
+    )
+
+    # Axis labels and title.
+    ax.set_xlabel("Dimensionless spin, χ")
+    ax.set_ylabel("ISCO radius, r_ISCO / (GM/c²)")
+    ax.set_title("Kerr Black Hole ISCO Radius vs. Spin")
+
+    ax.set_xlim(-1.0, 1.0)
+    ax.set_ylim(0, 10)
+
+    ax.grid(True, alpha=0.25)
+    ax.legend(frameon=False)
+    fig.tight_layout()
+
+    # Save at high resolution.
+    fig.savefig("isco_vs_spin.png", dpi=300, bbox_inches="tight")
 
     print("Graph saved as isco_vs_spin.png")
 
-    # Display the graph.
     plt.show()
 
 
