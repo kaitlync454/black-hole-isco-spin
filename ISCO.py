@@ -1,33 +1,45 @@
 
 """
-ISCO Black Hole Project
+Kerr Black Hole ISCO Calculator
+
 Calculate the innermost stable circular orbit (ISCO)
-for a rotating Kerr black hole.
+for an idealized rotating Kerr black hole.
 """
 
 import math
 
 # Physical constants (SI units)
-G = 6.67430e-11
-C = 299792458
-SOLAR_MASS = 1.98847e30
+G = 6.67430e-11       # Gravitational constant (m^3 kg^-1 s^-2)
+C = 299792458         # Speed of light (m/s)
+SOLAR_MASS = 1.98847e30  # Solar mass (kg)
 
 
 def calculate_isco(spin):
     """
-    Calculate the Kerr ISCO radius in gravitational-radius units.
+    Calculate the Kerr ISCO radius in units of GM/c^2.
 
     Parameters:
-        spin (float): Dimensionless black hole spin, from -1 to 1.
-                      Positive = prograde orbit.
-                      Negative = retrograde orbit.
+        spin (float): Dimensionless spin, from -1 to 1.
+                      Positive = prograde equatorial orbit.
+                      Negative = retrograde equatorial orbit.
 
     Returns:
-        float: ISCO radius in units of GM/c^2.
-    """
+        float: Dimensionless ISCO radius in units of GM/c^2.
 
-    if not -1.0 <= spin <= 1.0:
-        raise ValueError("Spin must be between -1 and 1.")
+    Raises:
+        ValueError: If spin is nonnumeric, nonfinite, or outside [-1, 1].
+    """
+    try:
+        spin = float(spin)
+    except (TypeError, ValueError, OverflowError):
+        raise ValueError("Spin must be a finite number between -1 and 1.")
+
+    if not math.isfinite(spin) or not -1.0 <= spin <= 1.0:
+        raise ValueError("Spin must be a finite number between -1 and 1.")
+
+    # Schwarzschild limit: nonrotating black hole.
+    if spin == 0.0:
+        return 6.0
 
     z1 = 1 + (1 - spin**2)**(1 / 3) * (
         (1 + abs(spin))**(1 / 3)
@@ -54,7 +66,15 @@ def gravitational_radius(mass_solar):
 
     Returns:
         float: Gravitational radius in meters.
+
+    Raises:
+        ValueError: If mass is nonnumeric, nonfinite, nonpositive,
+                    or too large for a finite result.
     """
+    try:
+        mass_solar = float(mass_solar)
+    except (TypeError, ValueError, OverflowError):
+        raise ValueError("Black hole mass must be positive and finite.")
 
     if not math.isfinite(mass_solar) or mass_solar <= 0:
         raise ValueError("Black hole mass must be positive and finite.")
@@ -63,31 +83,36 @@ def gravitational_radius(mass_solar):
 
     radius = G * mass_kg / C**2
 
+    if not math.isfinite(radius):
+        raise ValueError("Black hole mass is too large to calculate safely.")
+
     return radius
 
 
 def main():
-    """Run an example ISCO calculation."""
+    """Run example ISCO calculations."""
 
-    print("\nISCO Validation")
-    print("---------")
+    print("\nKerr ISCO Example Calculations")
+    print("------------------------------")
 
     test_spins = [-1.0, -0.5, 0.0, 0.5, 0.9, 0.998, 1.0]
 
     for test_spin in test_spins:
         radius = calculate_isco(test_spin)
-        print(f"Spin: {test_spin:>6.3f} | ISCO: {radius:.4f} GM/c^2")
+        print(
+            f"Spin: {test_spin:>6.3f} | "
+            f"ISCO: {radius:.4f} GM/c^2"
+        )
 
     mass_solar = 10.0
     spin = 0.9
 
     isco_rg = calculate_isco(spin)
     rg_m = gravitational_radius(mass_solar)
-
     isco_km = isco_rg * rg_m / 1000
 
-    print("Kerr Black Hole ISCO Calculator")
-    print("--------------------------------")
+    print("\nExample Physical Radius")
+    print("-----------------------")
     print(f"Black hole mass: {mass_solar:.2f} solar masses")
     print(f"Dimensionless spin: {spin:.2f}")
     print(f"Gravitational radius: {rg_m / 1000:.3f} km")
@@ -97,4 +122,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
